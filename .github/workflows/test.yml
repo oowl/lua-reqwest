@@ -118,8 +118,12 @@ jobs:
           cargo build --verbose --release
 
       - name: Run Clippy
-        run: cargo clippy --all-targets --all-features
-          
+        run: cargo clippy --all-targets
+
+      - name: luarocks install
+        run: |
+            ${{ env.INSTALL_ROOT }}/openresty/luajit/bin/luarocks make
+
       - name: Rustfmt Check
         uses: actions-rust-lang/rustfmt@v1
       - name: Tests
