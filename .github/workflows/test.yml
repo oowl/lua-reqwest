@@ -131,9 +131,7 @@ jobs:
 
       - name: luarocks install
         run: |
-            ls -al ${{ env.INSTALL_ROOT }}/openresty/luajit/bin
-            ls -al ${{ env.INSTALL_ROOT }}/openresty/luajit/
-            ${{ env.INSTALL_ROOT }}/openresty/luajit/bin/luarocks make
+            luarocks make
 
       - name: Rustfmt Check
         uses: actions-rust-lang/rustfmt@v1
