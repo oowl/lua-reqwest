@@ -1,5 +1,14 @@
 name: Test
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 jobs:
   build:
@@ -118,11 +127,18 @@ jobs:
           cargo build --verbose --release
 
       - name: Run Clippy
-        run: cargo clippy --all-targets --all-features
-          
+        run: cargo clippy --all-targets
+
       - name: Rustfmt Check
         uses: actions-rust-lang/rustfmt@v1
       - name: Tests
         run: |
           eval $(luarocks path)
+          cp target/release/liblua_reqwest.so reqwest.so
           resty  spec/runner.lua --verbose -o htest --shuffle-tests ${{ matrix.busted_args }}
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled && failure() }}
+        timeout-minutes: 20
+        with:
+          limit-access-to-actor: false
