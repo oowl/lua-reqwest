@@ -1,0 +1,16 @@
+local reqwest = require("reqwest")
+
+
+describe("reqwest", function()
+  it("should make a request", function()
+    local res, err = reqwest.request("https://cloudflare.com/cdn-cgi/trace", { headers = { ["User-Agent"] = "reqwest" }, version = 2 })
+    assert.is_nil(err)
+    assert.is_table(res)
+    assert.is_table(res.headers)
+    assert.is_number(res.status)
+    assert.equals(200, res.status)
+    assert.is_string(res.body)
+    local match_http2 = string.match(res.body, "http/2")
+    assert.equals("http/2", match_http2)
+  end)
+end)

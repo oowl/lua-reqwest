@@ -1,0 +1,128 @@
+name: Test
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build OpenResty ${{ matrix.openresty_version }}
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        openresty_version:
+        - "1.19.9.1"
+        - "1.21.4.1"
+    
+    env:
+      OPENRESTY_VERSION: ${{ matrix.openresty_version }}
+
+    steps:
+      - name: Set environment variables
+        run: |
+          echo "INSTALL_ROOT=$HOME/install-root" >> $GITHUB_ENV
+          echo "DOWNLOAD_ROOT=$HOME/download-root" >> $GITHUB_ENV
+          mkdir -p $HOME/install-root
+          mkdir -p $HOME/download-root
+
+      - name: Lookup build cache
+        uses: actions/cache@v2
+        id: cache-openresty
+        with:
+          path: ${{ env.INSTALL_ROOT }}
+          key: ${{ env.OPENRESTY_VERSION }}
+
+      - name: Download OpenResty
+        if: steps.cache-openresty.outputs.cache-hit != 'true'
+        run: |
+          wget https://openresty.org/download/openresty-${OPENRESTY_VERSION}.tar.gz -O openresty.tar.gz
+          mkdir openresty
+          tar zxf openresty.tar.gz --directory openresty --strip-components=1
+
+      - name: Install
+        if: steps.cache-openresty.outputs.cache-hit != 'true'
+        run: |
+          cd openresty
+          sudo ./configure --prefix=${{ env.INSTALL_ROOT }}/openresty
+          sudo make -j$(nproc)
+          sudo make install
+
+
+  test:
+    name: Test ${{ matrix.busted_args }} (OpenResty ${{ matrix.openresty_version }})
+    runs-on: ubuntu-20.04
+    needs: build
+
+    strategy:
+      matrix:
+        busted_args:
+        - "spec/*_spec.lua"
+
+        openresty_version:
+        - "1.19.9.1"
+        - "1.21.4.1"
+
+    env:
+      OPENRESTY_VERSION: ${{ matrix.openresty_version }}
+  
+    steps:
+      - name: Set environment variables
+        run: |
+          echo "INSTALL_ROOT=$HOME/install-root" >> $GITHUB_ENV
+          echo "DOWNLOAD_ROOT=$HOME/download-root" >> $GITHUB_ENV
+          mkdir -p $HOME/install-root
+          mkdir -p $HOME/download-root
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get --yes update
+          # https://github.com/actions/runner-images/issues/2139
+          sudo apt-get remove nginx-core nginx-full nginx-light nginx-extras
+          sudo apt-get remove libgd3
+          sudo apt-get install --yes build-essential zlib1g-dev libpcre3 libpcre3-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev libgd-dev libperl-dev
+
+      - name: Lookup build cache
+        uses: actions/cache@v2
+        id: cache-openresty
+        with:
+          path: ${{ env.INSTALL_ROOT }}
+          key: ${{ env.OPENRESTY_VERSION }}
+
+      - name: Install LuaRocks
+        run: |
+          sudo ln -s ${{ env.INSTALL_ROOT }}/openresty/bin/resty /bin/resty
+          sudo ln -s ${{ env.INSTALL_ROOT }}/openresty/luajit/bin/luajit /bin/luajit
+          pushd ${{ env.DOWNLOAD_ROOT }}
+          wget https://luarocks.org/releases/luarocks-3.8.0.tar.gz -O luarocks.tar.gz
+          mkdir luarocks
+          tar zxf luarocks.tar.gz --directory luarocks --strip-components=1
+          pushd luarocks
+          sudo ./configure --with-lua-include=${{ env.INSTALL_ROOT }}/openresty/luajit/include/luajit-2.1 --with-lua-lib=${{ env.INSTALL_ROOT }}/openresty/luajit/lib --with-lua-interpreter=luajit
+          sudo make -j$(nproc)
+          sudo make install
+          popd
+          popd
+
+      - name: Install busted
+        run: |
+          sudo luarocks install busted
+          sudo luarocks install busted-htest
+          sudo luarocks install luacov
+          sudo luarocks install luacov-console
+
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+            components: rustfmt
+      - name: build rust code
+        run: |
+          cargo build --verbose --release
+
+      - name: Run Clippy
+        run: cargo clippy --all-targets --all-features
+          
+      - name: Rustfmt Check
+        uses: actions-rust-lang/rustfmt@v1
+      - name: Tests
+        run: |
+          eval $(luarocks path)
+          resty  spec/runner.lua --verbose -o htest --shuffle-tests ${{ matrix.busted_args }}
