@@ -134,7 +134,7 @@ jobs:
       - name: Tests
         run: |
           eval $(luarocks path)
-          cp target/release/libreqwest.so reqwest.so
+          cp target/release/liblua_reqwest.so reqwest.so
           resty  spec/runner.lua --verbose -o htest --shuffle-tests ${{ matrix.busted_args }}
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
