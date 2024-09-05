@@ -129,17 +129,12 @@ jobs:
       - name: Run Clippy
         run: cargo clippy --all-targets
 
-      - name: luarocks install
-        run: |
-            cargo_path=`which cargo`
-            sudo cp $cargo_path /usr/bin/
-            sudo -E luarocks make
-
       - name: Rustfmt Check
         uses: actions-rust-lang/rustfmt@v1
       - name: Tests
         run: |
           eval $(luarocks path)
+          cp target/release/libreqwest.so reqwest.so
           resty  spec/runner.lua --verbose -o htest --shuffle-tests ${{ matrix.busted_args }}
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
