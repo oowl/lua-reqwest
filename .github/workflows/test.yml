@@ -131,7 +131,7 @@ jobs:
 
       - name: luarocks install
         run: |
-            sudo luarocks make
+            sudo -E luarocks make
 
       - name: Rustfmt Check
         uses: actions-rust-lang/rustfmt@v1
