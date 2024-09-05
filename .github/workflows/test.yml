@@ -131,7 +131,8 @@ jobs:
 
       - name: luarocks install
         run: |
-            cp `which cargo` /usr/bin/
+            cargo_path=`which cargo`
+            sudo cp $cargo_path /usr/bin/
             sudo -E luarocks make
 
       - name: Rustfmt Check
