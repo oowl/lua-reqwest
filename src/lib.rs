@@ -1,5 +1,5 @@
-use reqwest::header;
 use bstr::BString;
+use reqwest::header;
 
 use mlua::prelude::*;
 
