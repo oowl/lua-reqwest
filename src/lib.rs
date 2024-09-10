@@ -77,8 +77,17 @@ fn request<'lua>(
                     .map_err(LuaError::external)?;
             }
         }
+
+        if opts.contains_key("tls_verify").is_ok() {
+            let value = opts.get::<_, LuaValue>("tls_verify")?;
+            if !value.is_nil() {
+                let tls_verify = opts.get::<_, bool>("tls_verify")?;
+                builder = builder.danger_accept_invalid_certs(!tls_verify);
+            }
+        }
     }
 
+    builder = builder.tls_sni(true);
     let client = builder.build().map_err(LuaError::external)?;
 
     let res = client.request(method, &url).body(body).send();
