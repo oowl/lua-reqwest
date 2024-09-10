@@ -1,4 +1,5 @@
 use reqwest::header;
+use bstr::BString;
 
 use mlua::prelude::*;
 
@@ -89,10 +90,11 @@ fn request<'lua>(
 
     let headers = res.headers().clone();
     let status = res.status().as_u16();
-    let body = res.text().map_err(LuaError::external)?;
+    let body = res.bytes().map_err(LuaError::external)?;
 
     let table = lua.create_table()?;
-    table.set("body", body)?;
+    let body_bytes = BString::from(body.to_vec());
+    table.set("body", body_bytes)?;
     table.set("status", status)?;
     let lheaders = lua.create_table()?;
     for (name, value) in headers {
