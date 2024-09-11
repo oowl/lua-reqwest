@@ -70,7 +70,7 @@ fn request<'lua>(
         }
 
         if opts.contains_key("method").is_ok() {
-            let value = opts.get::<_, LuaValue>("body")?;
+            let value = opts.get::<_, LuaValue>("method")?;
             if value.is_string() {
                 let method_str = opts.get::<_, String>("method")?;
                 method = reqwest::Method::from_bytes(method_str.as_bytes())
