@@ -91,10 +91,7 @@ fn request<'lua>(
 
     let res = match res {
         Ok(res) => res,
-        Err(e) => {
-            println!("error {:?}", e);
-            return Err(LuaError::external(e));
-        },
+        Err(e) => return Err(LuaError::external(e)),
     };
 
     let headers = res.headers().clone();
