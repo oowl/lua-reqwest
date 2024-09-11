@@ -5,11 +5,27 @@ A simple Lua HTTP client based on [reqwest](https://docs.rs/reqwest/latest/reqwe
 ## Installation
 
 ```sh
-cargo build --release
-cp target/release/libreqwest.so /usr/local/lib/lua/5.1/
+# install from local source
+luarocks make reqwest-0.1.0-1.rockspec
+# install from luarocks
+luarocks install lua-reqwest
 ```
 
-## Usage
+## APIS
+
+### reqwest.request(url, options)
+
+- `url` (string): The URL to request.
+- `options` (table): The request options.
+  - `method` (string): The request method, default is `GET`.
+  - `headers` (table): The request headers.
+  - `body` (string): The request body.
+  - `version` (number): The HTTP version, default is `1.1`.
+  - `timeout` (number): The request timeout in seconds, default is `30`.
+  - `connect_timeout` (number): The request connect timeout in seconds.
+  - `tls_verify` (boolean): Verify the TLS certificate, default is `true`.
+
+## Example
 
 ```lua
 local reqwest = require("reqwest")

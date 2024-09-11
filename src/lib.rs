@@ -29,9 +29,6 @@ fn request<'lua>(
         if opts.contains_key("timeout").is_ok() {
             let value = opts.get::<_, LuaValue>("timeout")?;
             if !value.is_nil() {
-                let value = opts.get::<_, LuaValue>("timeout")?;
-                println!("timeout {:?}", value);
-
                 let timeout = opts.get::<_, u64>("timeout")?;
                 builder = builder.timeout(std::time::Duration::from_secs(timeout));
             }
@@ -94,7 +91,10 @@ fn request<'lua>(
 
     let res = match res {
         Ok(res) => res,
-        Err(e) => return Err(LuaError::external(e)),
+        Err(e) => {
+            println!("error {:?}", e);
+            return Err(LuaError::external(e));
+        },
     };
 
     let headers = res.headers().clone();
