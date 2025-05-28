@@ -13,7 +13,7 @@ on:
 jobs:
   build:
     name: Build OpenResty ${{ matrix.openresty_version }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     strategy:
       matrix:
@@ -57,7 +57,7 @@ jobs:
 
   test:
     name: Test ${{ matrix.busted_args }} (OpenResty ${{ matrix.openresty_version }})
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: build
 
     strategy:
