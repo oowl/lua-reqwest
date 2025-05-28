@@ -33,7 +33,7 @@ jobs:
           mkdir -p $HOME/download-root
 
       - name: Lookup build cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cache-openresty
         with:
           path: ${{ env.INSTALL_ROOT }}
@@ -89,7 +89,7 @@ jobs:
           sudo apt-get install --yes build-essential zlib1g-dev libpcre3 libpcre3-dev libssl-dev libxslt1-dev libxml2-dev libgeoip-dev libgd-dev libperl-dev
 
       - name: Lookup build cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cache-openresty
         with:
           path: ${{ env.INSTALL_ROOT }}
