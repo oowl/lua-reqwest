@@ -15,5 +15,5 @@ crate-type = ["cdylib"]
 
 [dependencies]
 mlua = { version = "0.9.9", features = ["luajit", "module"] }
-reqwest = { version = "0.12.7", features = ["blocking", "native-tls-alpn"] }
+reqwest = { version = "=0.12.7", features = ["blocking", "native-tls-alpn"] }
 bstr = "1.10.0"
