@@ -123,7 +123,7 @@ fn hello(_: &Lua, name: String) -> LuaResult<()> {
 }
 
 #[mlua::lua_module]
-fn reqwest(lua: &Lua) -> LuaResult<LuaTable> {
+fn reqwest(lua: &Lua) -> LuaResult<LuaTable<'_>> {
     let exports = lua.create_table()?;
     exports.set("hello", lua.create_function(hello)?)?;
     exports.set(
