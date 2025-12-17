@@ -124,10 +124,10 @@ jobs:
             components: rustfmt
       - name: build rust code
         run: |
-          cargo build --verbose --release
+          cargo build --features "luajit" --verbose --release
 
       - name: Run Clippy
-        run: cargo clippy --all-targets
+        run: cargo clippy --all-targets --features "luajit"
 
       - name: Rustfmt Check
         uses: actions-rust-lang/rustfmt@v1
