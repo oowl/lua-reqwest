@@ -37,7 +37,6 @@ fn request<'lua>(
         if opts.contains_key("connect_timeout").is_ok() {
             let value = opts.get::<_, LuaValue>("connect_timeout")?;
             if !value.is_nil() {
-                println!("connect_timeout");
                 let timeout = opts.get::<_, u64>("connect_timeout")?;
                 builder = builder.connect_timeout(std::time::Duration::from_secs(timeout));
             }
