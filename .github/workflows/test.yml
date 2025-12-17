@@ -100,7 +100,7 @@ jobs:
           sudo ln -s ${{ env.INSTALL_ROOT }}/openresty/bin/resty /bin/resty
           sudo ln -s ${{ env.INSTALL_ROOT }}/openresty/luajit/bin/luajit /bin/luajit
           pushd ${{ env.DOWNLOAD_ROOT }}
-          wget https://luarocks.org/releases/luarocks-3.8.0.tar.gz -O luarocks.tar.gz
+          wget https://luarocks.org/releases/luarocks-3.12.2.tar.gz -O luarocks.tar.gz
           mkdir luarocks
           tar zxf luarocks.tar.gz --directory luarocks --strip-components=1
           pushd luarocks
