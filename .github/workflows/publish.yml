@@ -15,7 +15,7 @@ jobs:
       - name: Install LuaRocks
         uses: hishamhm/gh-actions-lua@master
         with:
-          luaVersion: "5.4"
+          luaVersion: "5.1"
 
       - uses: hishamhm/gh-actions-luarocks@master
 
