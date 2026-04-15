@@ -2,6 +2,10 @@ name: Publish to LuaRocks
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g. 0.1.5)'
+        required: true
   push:
     tags:
       - "*"
@@ -23,7 +27,7 @@ jobs:
         env:
           LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
         run: |
-          TAG="${GITHUB_REF#refs/tags/}"
+          TAG="${{ github.event.inputs.version || github.ref_name }}"
           ROCKSPEC="lua-reqwest-${TAG}-1.rockspec"
           if [ ! -f "$ROCKSPEC" ]; then
             echo "Error: $ROCKSPEC not found"
