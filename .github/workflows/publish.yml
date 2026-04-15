@@ -23,4 +23,10 @@ jobs:
         env:
           LUAROCKS_API_KEY: ${{ secrets.LUAROCKS_API_KEY }}
         run: |
-          luarocks upload lua-reqwest-0.1.5-1.rockspec --api-key="$LUAROCKS_API_KEY"
+          TAG="${GITHUB_REF#refs/tags/}"
+          ROCKSPEC="lua-reqwest-${TAG}-1.rockspec"
+          if [ ! -f "$ROCKSPEC" ]; then
+            echo "Error: $ROCKSPEC not found"
+            exit 1
+          fi
+          luarocks upload "$ROCKSPEC" --api-key="$LUAROCKS_API_KEY"
